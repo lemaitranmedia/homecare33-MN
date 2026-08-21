@@ -1,0 +1,67 @@
+name: Cập nhật lịch sử HomeCare 33
+
+on:
+  schedule:
+    # 01:12 UTC = 08:12 sáng giờ Việt Nam, hằng ngày.
+    # Cố tình KHÔNG đặt đúng phút :00 — GitHub khuyến nghị tránh phút tròn vì
+    # đó là lúc hàng loạt workflow trên toàn thế giới cùng chạy, dễ bị xếp hàng
+    # trễ 10-30 phút. Đặt lệch phút thì thực tế lại chạy gần 8h hơn.
+    # Lần chạy này đóng dấu số vào ngày HÔM QUA (xem DATE_MODE bên dưới).
+    - cron: '12 1 * * *'
+
+  # Chạy tay (adhoc). CHỈ người có quyền ghi vào repo mới bấm được nút này,
+  # kể cả khi repo để công khai — người ngoài xem được lịch sử chạy nhưng
+  # không kích hoạt được.
+  workflow_dispatch:
+    inputs:
+      date_mode:
+        description: 'Đóng dấu số vào ngày nào?'
+        required: true
+        default: 'today'
+        type: choice
+        options:
+          - today
+          - yesterday
+
+  # (Tuỳ chọn, nâng cao) Cho phép kích hoạt từ bên ngoài bằng API —
+  # ví dụ Google Apps Script tự gọi mỗi khi sheet có thay đổi.
+  # Xem optional-google-apps-script.gs.
+  repository_dispatch:
+    types: [update-history]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-history
+  cancel-in-progress: false
+
+jobs:
+  update-history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch sheet & cập nhật history.json
+        env:
+          # Chạy theo lịch 08:00 -> đóng dấu ngày hôm qua (số chốt của hôm qua).
+          # Chạy tay -> theo lựa chọn khi bấm nút, mặc định là hôm nay.
+          # Gọi qua API -> mặc định hôm nay.
+          DATE_MODE: ${{ github.event_name == 'schedule' && 'yesterday' || (github.event.inputs.date_mode || 'today') }}
+        run: node scripts/update-history.mjs
+
+      - name: Commit & push nếu có thay đổi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add history.json
+          if git diff --staged --quiet; then
+            echo "Không có thay đổi so với lần chạy trước — bỏ qua commit."
+          else
+            git commit -m "chore: cập nhật history.json ($(TZ=Asia/Ho_Chi_Minh date +'%Y-%m-%d %H:%M') giờ VN)"
+            git push
+          fi
