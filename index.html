@@ -1,0 +1,767 @@
+<meta charset="UTF-8">
+<title>HomeCare 33 Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap">
+
+<style>
+  :root{
+    color-scheme: light;
+    --bg: #eef1f6;
+    --surface: #ffffff;
+    --surface-inset: #f5f7fa;
+    --ink-primary: #0b2340;
+    --ink-secondary: #55617a;
+    --ink-muted: #8a96ad;
+    --grid: #e3e7ee;
+    --border: rgba(11,35,64,0.12);
+    --shadow: 0 1px 2px rgba(11,35,64,.06), 0 8px 24px -16px rgba(11,35,64,.18);
+    --series-tcb: #d3202b;
+    --series-mh:  #b8862e;
+    --series-oh:  #0e7c5a;
+    --series-sbk: #2a78d6;
+    --series-hbk: #eb6834;
+    --status-good: #0ca30c;
+    --status-warning: #b4790a;
+    --status-critical: #d03b3b;
+    --rank1-bg: rgba(11,35,64,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #080e18;
+      --surface: #111d2f;
+      --surface-inset: #0d1726;
+      --ink-primary: #f3f5f9;
+      --ink-secondary: #b7c0d1;
+      --ink-muted: #71809a;
+      --grid: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.5);
+      --series-tcb: #e4606b;
+      --series-mh:  #c69a4a;
+      --series-oh:  #1b9a7c;
+      --series-sbk: #3987e5;
+      --series-hbk: #d95926;
+      --status-good: #0ca30c;
+      --status-warning: #d99a1a;
+      --status-critical: #e2665f;
+      --rank1-bg: rgba(255,255,255,0.06);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg: #080e18;
+    --surface: #111d2f;
+    --surface-inset: #0d1726;
+    --ink-primary: #f3f5f9;
+    --ink-secondary: #b7c0d1;
+    --ink-muted: #71809a;
+    --grid: rgba(255,255,255,0.09);
+    --border: rgba(255,255,255,0.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.5);
+    --series-tcb: #e4606b;
+    --series-mh:  #c69a4a;
+    --series-oh:  #1b9a7c;
+    --series-sbk: #3987e5;
+    --series-hbk: #d95926;
+    --status-good: #0ca30c;
+    --status-warning: #d99a1a;
+    --status-critical: #e2665f;
+    --rank1-bg: rgba(255,255,255,0.06);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink-primary);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3, .num-hero, .num-lg{ font-family: "Manrope", "IBM Plex Sans", system-ui, sans-serif; text-wrap: balance; }
+  .tnum{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+  a{ color: inherit; }
+
+  .page{ max-width: 1280px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ---------- header ---------- */
+  .hc-header{
+    display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end;
+    gap:16px; margin-bottom:22px; padding-bottom:20px; border-bottom: 1px solid var(--border);
+  }
+  .hc-title-block .eyebrow{
+    font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color: var(--ink-muted);
+    font-weight:600; margin:0 0 6px;
+  }
+  .hc-title-block h1{ font-size: 27px; font-weight:800; margin:0 0 6px; color:var(--ink-primary); }
+  .hc-title-block .sub{ font-size:13.5px; color:var(--ink-secondary); margin:0; }
+  .hc-title-block{ min-width:0; }
+  .hc-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; margin-left:auto; }
+  .phase-pill{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+    padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:var(--surface-inset);
+    color:var(--ink-secondary); white-space:nowrap;
+  }
+  .phase-pill .dot{ width:6px;height:6px;border-radius:50%; background: var(--status-good); flex:none; }
+  .phase-pill.upcoming .dot{ background: var(--status-warning); }
+  .refresh-note{ font-size:11.5px; color:var(--ink-muted); text-align:right; display:flex; align-items:center; gap:9px; justify-content:flex-end; }
+  .refresh-note b{ color:var(--ink-secondary); font-weight:600; }
+  .refresh-btn{
+    font-size:11px; font-weight:600; color:var(--ink-secondary); background:var(--surface-inset);
+    border:1px solid var(--border); border-radius:7px; padding:3px 9px; cursor:pointer; white-space:nowrap;
+    font-family:inherit;
+  }
+  .refresh-btn:hover{ color:var(--ink-primary); border-color:var(--ink-muted); }
+  .refresh-btn[disabled]{ opacity:.55; cursor:default; }
+
+  section{ margin-bottom: 34px; }
+  .sec-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .sec-head h2{ font-size:16.5px; font-weight:700; margin:0; color:var(--ink-primary); }
+  .sec-head .sec-note{ font-size:12px; color:var(--ink-muted); }
+
+  .card{
+    background: var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow: var(--shadow); padding:20px;
+  }
+
+  /* ---------- KPI row ---------- */
+  .kpi-row{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; }
+  @media (max-width: 760px){ .kpi-row{ grid-template-columns: 1fr; } }
+  .kpi-card{ display:flex; flex-direction:column; gap:16px; }
+  .kpi-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .kpi-label{ font-size:13px; font-weight:600; color:var(--ink-secondary); }
+  .kpi-label .swatch{ display:inline-block; width:9px;height:9px;border-radius:2px; margin-right:7px; vertical-align:1px; }
+  .kpi-detail-btn{
+    font-size:11px; font-weight:600; color:var(--ink-secondary); background:var(--surface-inset);
+    border:1px solid var(--border); border-radius:7px; padding:4px 10px; cursor:pointer; white-space:nowrap; flex:none;
+  }
+  .kpi-detail-btn:hover{ color:var(--ink-primary); border-color:var(--ink-muted); }
+  .kpi-values{ display:flex; align-items:flex-end; gap:26px; flex-wrap:wrap; }
+  .kpi-value-block{ display:flex; flex-direction:column; gap:3px; }
+  .kpi-value-num{ font-size:40px; font-weight:800; line-height:1; color:var(--ink-primary); }
+  .kpi-value-tag{ font-size:10.5px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; }
+  .kpi-value-block.hot .kpi-value-num{ font-size:26px; }
+  .kpi-value-num.pos{ color:var(--status-good); }
+  .kpi-value-num.down{ color:var(--status-critical); }
+  .kpi-value-num.zero{ color:var(--ink-muted); }
+  .stackbar{ height:22px; border-radius:6px; overflow:hidden; display:flex; background:var(--surface-inset); border:1px solid var(--border); }
+  .stackbar .seg{ height:100%; position:relative; min-width:2px; }
+  .stackbar .seg + .seg{ border-left: 2px solid var(--surface); }
+  .legend-row{ display:flex; flex-wrap:wrap; gap:14px 20px; }
+  .legend-item{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-secondary); }
+  .legend-item .sw{ width:9px; height:9px; border-radius:2px; flex:none; }
+  .legend-item b{ color:var(--ink-primary); font-weight:700; }
+
+  /* ---------- ranking ---------- */
+  .rank-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+  @media (max-width: 860px){ .rank-grid{ grid-template-columns: 1fr; } }
+  .rank-card h3{ font-size:14px; font-weight:700; margin:0 0 3px; }
+  .rank-card .rank-sub{ font-size:11.5px; color:var(--ink-muted); margin:0 0 14px; }
+  table.rank-table{ width:100%; border-collapse:collapse; }
+  table.rank-table th{
+    text-align:left; font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink-muted); padding:0 8px 8px; border-bottom:1px solid var(--border);
+  }
+  table.rank-table td{ padding:9px 8px; border-bottom:1px solid var(--grid); font-size:13px; vertical-align:middle; }
+  table.rank-table tr:last-child td{ border-bottom:none; }
+  table.rank-table tr.rank1 td{ background: var(--rank1-bg); }
+  table.rank-table tr.rank1 td:first-child{ border-radius:8px 0 0 8px; }
+  table.rank-table tr.rank1 td:last-child{ border-radius:0 8px 8px 0; }
+  .rank-num{ font-weight:700; color:var(--ink-muted); width:22px; }
+  tr.rank1 .rank-num{ color: var(--ink-primary); }
+  .team-name{ font-weight:700; color:var(--ink-primary); }
+  .rank-bar-cell{ width:38%; }
+  .rank-bar-track{ height:8px; border-radius:4px; background:var(--surface-inset); border:1px solid var(--border); overflow:hidden; }
+  .rank-bar-fill{ height:100%; border-radius:4px; }
+  .rank-val{ font-weight:700; text-align:right; white-space:nowrap; }
+  .rank-cr{ text-align:right; color:var(--ink-secondary); }
+  .locked-card{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; min-height:200px; color:var(--ink-muted); }
+  .locked-card .lock-date{ font-weight:700; color:var(--ink-secondary); font-size:15px; }
+  .locked-card .lock-count{ font-size:12px; }
+
+  /* ---------- competition ---------- */
+  .comp-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+  @media (max-width: 860px){ .comp-grid{ grid-template-columns: 1fr; } }
+  .comp-card h3{ font-size:14px; font-weight:700; margin:0 0 16px; display:flex; justify-content:space-between; align-items:center; }
+  .comp-toggle{
+    font-size:11px; font-weight:600; color:var(--ink-secondary); background:var(--surface-inset);
+    border:1px solid var(--border); border-radius:7px; padding:4px 9px; cursor:pointer;
+  }
+  .comp-toggle:hover{ color:var(--ink-primary); }
+  .team-row{ display:grid; grid-template-columns: 68px 1fr; align-items:center; gap:10px; margin-bottom:12px; }
+  .team-row:last-child{ margin-bottom:0; }
+  .team-row .tlabel{ font-size:12.5px; font-weight:700; color:var(--ink-primary); }
+  .team-row .tbars{ display:flex; flex-direction:column; gap:3px; }
+  .zone-row{ display:grid; grid-template-columns: 92px 1fr; align-items:center; gap:10px; margin-bottom:9px; }
+  .zone-row:last-child{ margin-bottom:0; }
+  .zone-row .tlabel{ font-size:12px; font-weight:600; color:var(--ink-secondary); }
+  .zone-row.zone-nonzero .tlabel{ color:var(--ink-primary); font-weight:700; }
+  .zone-row .tbars{ display:flex; flex-direction:column; gap:3px; }
+  .mbar-line{ display:flex; align-items:center; gap:7px; height:13px; }
+  .mbar-track{ flex:1; height:9px; border-radius:3px; background:var(--surface-inset); position:relative; overflow:visible; }
+  .mbar-fill{ height:100%; border-radius:3px; min-width:2px; }
+  .mbar-val{ font-size:10.5px; color:var(--ink-muted); width:16px; text-align:right; flex:none; }
+  .src-legend{ margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .data-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-top:6px; }
+  .data-table th, .data-table td{ padding:6px 8px; border-bottom:1px solid var(--grid); text-align:right; }
+  .data-table th:first-child, .data-table td:first-child{ text-align:left; }
+  .data-table th{ color:var(--ink-muted); font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; }
+  .hidden{ display:none !important; }
+
+  /* ---------- timeline (variance dot chart, DoD) ---------- */
+  .timeline-top{ margin-bottom:0; }
+  .single-point-note{ font-size:10.5px; color:var(--ink-muted); margin-top:6px; }
+  .overview-svg-wrap{ width:100%; }
+  .variance-chart-wrap{ width:100%; overflow-x:auto; }
+  .variance-chart-wrap + .variance-chart-wrap{ margin-top:18px; padding-top:18px; border-top:1px solid var(--border); }
+  .sw.tri-up{ width:0; height:0; background:none; border-radius:0; border-left:5px solid transparent; border-right:5px solid transparent; border-bottom:8px solid var(--status-good); }
+  .sw.tri-down{ width:0; height:0; background:none; border-radius:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid var(--status-critical); }
+  .sw.dot-flat{ border-radius:50%; background:var(--status-warning); }
+  .sw.dot-neutral{ border-radius:50%; background:var(--ink-muted); }
+
+  /* ---------- accum / hot ---------- */
+  .accum-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; align-items:start; }
+  @media (max-width: 860px){ .accum-grid{ grid-template-columns: 1fr; } }
+  .accum-card h3{ font-size:14px; font-weight:700; margin:0 0 4px; }
+  .accum-card .accum-sub{ font-size:11.5px; color:var(--ink-muted); margin:0 0 14px; }
+  .accum-table{ width:100%; }
+  .accum-table th, .accum-table td{ padding:7px 8px; }
+  .accum-table thead th{ border-bottom:1px solid var(--border); }
+  .accum-table thead .grp-sbk{ color:var(--series-sbk); }
+  .accum-table thead .grp-hbk{ color:var(--series-hbk); }
+  .accum-table td.rowlabel{ font-weight:600; color:var(--ink-primary); }
+  .accum-table tbody tr:hover td{ background:var(--surface-inset); }
+
+  /* Generic delta-direction utilities — reused by the KPI per-source deltas
+     and the Accum/Hot table's "hôm nay" columns. */
+  .pos{ color:var(--status-good); }
+  .down{ color:var(--status-critical); }
+  .zero{ color:var(--ink-muted); }
+  .src-delta{ font-weight:600; font-size:11.5px; }
+
+  /* ---------- countdown ---------- */
+  .countdown-row{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; }
+  @media (max-width: 760px){ .countdown-row{ grid-template-columns: 1fr; } }
+  .cd-card{ display:flex; flex-direction:column; gap:10px; }
+  .cd-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .cd-label{ font-size:13px; font-weight:600; color:var(--ink-secondary); }
+  .cd-date{ font-size:12px; color:var(--ink-muted); }
+  .cd-units{ display:flex; gap:18px; }
+  .cd-unit{ display:flex; flex-direction:column; align-items:flex-start; }
+  .cd-unit .n{ font-size:32px; font-weight:800; color:var(--ink-primary); line-height:1; }
+  .cd-unit .u{ font-size:10.5px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:3px; }
+  .cd-reached-note{ display:none; }
+  .cd-card.reached .cd-units{ display:none; }
+  .cd-card.reached .cd-reached-note{ display:block; font-size:15px; font-weight:700; color:var(--status-good); }
+
+  svg text{ font-family:"IBM Plex Sans", system-ui, sans-serif; }
+</style>
+
+<div class="page">
+
+  <header class="hc-header">
+    <div class="hc-title-block">
+      <p class="eyebrow">OneHousing &middot; SIH Miền Nam</p>
+      <h1>Chiến dịch HomeCare 33 — SBK &amp; HBK Command Center</h1>
+    </div>
+    <div class="hc-meta">
+      <span class="phase-pill" id="phase-pill"><span class="dot"></span><span id="phase-pill-text">—</span></span>
+      <div class="refresh-note">
+        <span>Cập nhật <b id="refresh-time">—</b></span>
+        <button class="refresh-btn" id="refresh-btn" type="button" title="Đọc lại số mới nhất từ Google Sheet">Làm mới</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="countdown-row" id="countdown-row" aria-label="Đếm ngược mốc chiến dịch"></section>
+
+  <section class="kpi-row" id="kpi-row" aria-label="Chỉ số tổng quan"></section>
+
+  <section id="timeline-section">
+    <div class="sec-head">
+      <h2>Diễn biến theo ngày</h2>
+      <span class="sec-note" id="timeline-note"></span>
+    </div>
+    <div class="card timeline-top">
+      <div class="overview-svg-wrap" id="overview-chart"></div>
+    </div>
+  </section>
+
+  <section id="ranking-section">
+    <div class="sec-head">
+      <h2>Bảng xếp hạng team</h2>
+      <span class="sec-note" id="ranking-note"></span>
+    </div>
+    <div class="rank-grid" id="rank-grid"></div>
+  </section>
+
+  <section id="competition-section">
+    <div class="sec-head">
+      <h2>Thi đua giữa các team theo nguồn &amp; theo vùng TCB</h2>
+      <span class="sec-note">Cập nhật lúc <span id="comp-asof"></span> — số liệu cộng dồn từ đầu chiến dịch</span>
+    </div>
+    <div class="comp-grid" id="comp-grid"></div>
+  </section>
+
+  <section id="accum-section">
+    <div class="sec-head">
+      <h2>Tích lũy &amp; phát sinh hôm nay</h2>
+      <span class="sec-note" id="accum-note"></span>
+    </div>
+    <div class="accum-grid" id="accum-grid"></div>
+  </section>
+
+</div>
+
+<script type="module">
+import { parseCsv, extractSnapshot, todaySaigon, nowSaigonIso, csvUrl } from './parse-homecare33.mjs';
+
+const SHEET_ID = '1XyNcrpYsXEns2wOqvO5IibtkxuOj-NyGURljeOpneR8';
+const SHEET_TAB = 'Homecare33';
+
+function showLoadError(err){
+  const msg = (err && err.message) ? err.message : String(err);
+  document.querySelector('.page').innerHTML =
+    '<div class="card" style="max-width:640px;margin:80px auto;text-align:center;padding:32px">' +
+    '<h2 style="margin:0 0 10px">Không tải được dữ liệu trực tiếp</h2>' +
+    '<p style="color:var(--ink-secondary);margin:0 0 6px">' + msg + '</p>' +
+    '<p style="font-size:12px;color:var(--ink-muted)">Kiểm tra sheet nguồn có còn chia sẻ công khai không, hoặc cấu trúc bảng đã thay đổi so với lúc dashboard được thiết kế.</p>' +
+    '<button class="refresh-btn" type="button" onclick="location.reload()" style="margin-top:6px">Thử lại</button>' +
+    '</div>';
+}
+
+function showWarnings(list){
+  if (!list || !list.length) return;
+  const banner = document.createElement('div');
+  banner.className = 'card';
+  banner.style.cssText = 'margin-bottom:20px;border-color:var(--status-warning)';
+  banner.innerHTML = '<b style="color:var(--status-warning)">Cảnh báo đối chiếu số liệu — vẫn hiển thị số fetch được, nhưng nên kiểm tra lại sheet:</b><br>' +
+    list.map(w => '&middot; ' + w).join('<br>');
+  document.querySelector('.page').prepend(banner);
+}
+
+(async function(){
+  let DATA;
+  try {
+    const [metaRes, histRes, csvRes] = await Promise.all([
+      fetch('./static-meta.json', {cache: 'no-store'}),
+      fetch('./history.json', {cache: 'no-store'}),
+      fetch(csvUrl(SHEET_ID, SHEET_TAB), {cache: 'no-store'})
+    ]);
+    if (!metaRes.ok) throw new Error('Không tải được static-meta.json (HTTP ' + metaRes.status + ')');
+    if (!histRes.ok) throw new Error('Không tải được history.json (HTTP ' + histRes.status + ')');
+    if (!csvRes.ok) throw new Error('Không tải được dữ liệu trực tiếp từ Google Sheet (HTTP ' + csvRes.status + ')');
+
+    const staticMeta = await metaRes.json();
+    const loggedHistory = await histRes.json();
+    const csvText = await csvRes.text();
+    const rows = parseCsv(csvText);
+    const snap = extractSnapshot(rows);
+
+    const today = todaySaigon();
+    const liveEntry = {date: today, sbk: snap.sbk, hbk: snap.hbk, sbkZoneTCB: snap.sbkZoneTCB, hbkZoneTCB: snap.hbkZoneTCB};
+    const history = loggedHistory.slice();
+    const idx = history.findIndex(h => h.date === today);
+    if (idx >= 0) history[idx] = liveEntry; else history.push(liveEntry);
+    history.sort((a,b)=> a.date.localeCompare(b.date));
+
+    DATA = JSON.parse(JSON.stringify(staticMeta));
+    DATA.history = history;
+    DATA.meta.lastRefreshed = nowSaigonIso();
+
+    showWarnings(snap.warnings);
+  } catch (err){
+    showLoadError(err);
+    return;
+  }
+
+  // ---------- Tự làm mới ----------
+  // Trang đọc thẳng từ Google Sheet mỗi lần tải, nên "làm mới" = tải lại trang.
+  // Nút "Làm mới" bấm được bất cứ lúc nào. Ngoài ra trang TỰ tải lại sau mỗi
+  // AUTO_REFRESH_MS — nhưng chỉ khi người xem đang không thao tác (tab đang ẩn,
+  // hoặc không có chuột/phím trong IDLE_MS) — để không giật màn hình giữa lúc
+  // ai đó đang đọc. Nhờ vậy một tab để mở cả ngày vẫn luôn hiện số mới.
+  const AUTO_REFRESH_MS = 5 * 60 * 1000;
+  const IDLE_MS = 60 * 1000;
+  const loadedAt = Date.now();
+  let lastActivity = Date.now();
+  ['mousemove','keydown','click','scroll','touchstart'].forEach(ev=>
+    window.addEventListener(ev, ()=>{ lastActivity = Date.now(); }, {passive:true}));
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn){
+    refreshBtn.addEventListener('click', ()=>{
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'Đang tải…';
+      location.reload();
+    });
+  }
+  setInterval(()=>{
+    if (Date.now() - loadedAt < AUTO_REFRESH_MS) return;
+    if (document.hidden || (Date.now() - lastActivity > IDLE_MS)) location.reload();
+  }, 30000);
+
+  // >>> Từ đây trở xuống: giữ nguyên toàn bộ logic render của bản Artifact, không đổi gì <<<
+  const SOURCES = DATA.sources;
+  const SRC_LABEL = DATA.sourceLabels;
+  const SRC_COLOR_VAR = {TCB: '--series-tcb', OM: '--series-oh', MH: '--series-mh'};
+  const cs = getComputedStyle(document.documentElement);
+  function cvar(name){ return cs.getPropertyValue(name).trim(); }
+  function srcColor(s){ return cvar(SRC_COLOR_VAR[s]); }
+  const fmt = new Intl.NumberFormat('vi-VN');
+  const pct = (n) => (isFinite(n) ? (n*100).toFixed(0) + '%' : '—');
+  // Date helpers work on the raw string components so labels never drift
+  // with the viewer's own browser timezone (a real risk for 'YYYY-MM-DD'
+  // values parsed as UTC midnight).
+  function dmy(dateStr){ const [y,m,d] = dateStr.split('-'); return d + '/' + m + '/' + y; }
+  function dm(dateStr){ const [,m,d] = dateStr.split('-'); return d + '/' + m; }
+  function dmyHM(iso){ return dmy(iso.slice(0,10)) + ' ' + iso.slice(11,16); }
+  const LOCK_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px"><rect x="4" y="11" width="16" height="10" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M7.5 11V7.5a4.5 4.5 0 0 1 9 0V11" stroke="currentColor" stroke-width="2"/></svg>';
+
+  const history = DATA.history.slice().sort((a,b)=> a.date.localeCompare(b.date));
+  const latest = history[history.length-1];
+  const prev = history.length > 1 ? history[history.length-2] : null;
+  const teams = Object.keys(latest.sbk).sort();
+
+  function teamTotal(entry, metric, team){
+    const row = entry[metric][team] || {};
+    return SOURCES.reduce((s,src)=> s + (row[src]||0), 0);
+  }
+  function grandTotal(entry, metric){
+    return teams.reduce((s,t)=> s + teamTotal(entry, metric, t), 0);
+  }
+  function sourceTotal(entry, metric, src){
+    return teams.reduce((s,t)=> s + ((entry[metric][t]||{})[src]||0), 0);
+  }
+  const ZONES = DATA.zonesTCB || [];
+  function zoneKey(metric){ return metric === 'hbk' ? 'hbkZoneTCB' : 'sbkZoneTCB'; }
+  function zoneVal(entry, metric, zone){ return (entry[zoneKey(metric)] || {})[zone] || 0; }
+  function zoneGrandTotal(entry, metric){
+    return ZONES.reduce((s,z)=> s + zoneVal(entry, metric, z), 0);
+  }
+  // Shared delta formatting: used by the KPI per-source deltas and the
+  // Accum/Hot table's "hôm nay" columns. null = no previous day to diff against.
+  const fmtD = (d)=> d===null ? '—' : ((d>0?'+':'') + fmt.format(d));
+  const clsD = (d)=> d===null ? '' : (d>0?'pos':(d<0?'down':'zero'));
+  function buildRow(label, accumSFn, accumHFn){
+    const accumS = accumSFn(latest), accumH = accumHFn(latest);
+    return {
+      label,
+      accumS, accumH,
+      hotS: prev ? accumS - accumSFn(prev) : null,
+      hotH: prev ? accumH - accumHFn(prev) : null
+    };
+  }
+
+  // ---------- header meta ----------
+  document.getElementById('refresh-time').textContent = dmyHM(DATA.meta.lastRefreshed) + ' (giờ VN)';
+  document.getElementById('comp-asof').textContent = dmy(latest.date);
+
+  const todayStr = new Date().toISOString().slice(0,10);
+  const phase2Started = todayStr >= DATA.meta.phase2Start;
+  const pill = document.getElementById('phase-pill');
+  const pillText = document.getElementById('phase-pill-text');
+  if (phase2Started){
+    pillText.textContent = 'Giai đoạn 2 · HBK & CR đang mở';
+  } else {
+    pill.classList.add('upcoming');
+    pillText.textContent = 'Giai đoạn 1 · SBK';
+  }
+
+  // ---------- Countdown clocks ----------
+  function targetMs(dateStr){
+    // Anchor the target to 00:00 Asia/Saigon (+07:00) of that calendar date.
+    return new Date(dateStr + 'T00:00:00+07:00').getTime();
+  }
+  function renderCountdownCard(label, dateStr){
+    const id = 'cd-' + dateStr;
+    return '<div class="card cd-card" id="' + id + '" data-target="' + targetMs(dateStr) + '">' +
+      '<div class="cd-top"><span class="cd-label">' + label + '</span><span class="cd-date">' + dmy(dateStr) + '</span></div>' +
+      '<div class="cd-units">' +
+        '<div class="cd-unit"><span class="n tnum" data-u="d">00</span><span class="u">Ngày</span></div>' +
+        '<div class="cd-unit"><span class="n tnum" data-u="h">00</span><span class="u">Giờ</span></div>' +
+        '<div class="cd-unit"><span class="n tnum" data-u="m">00</span><span class="u">Phút</span></div>' +
+        '<div class="cd-unit"><span class="n tnum" data-u="s">00</span><span class="u">Giây</span></div>' +
+      '</div>' +
+      '<div class="cd-reached-note">Đã tới mốc</div>' +
+    '</div>';
+  }
+  document.getElementById('countdown-row').innerHTML =
+    renderCountdownCard('Đếm ngược tới mốc ráp căn (bắt đầu tính CR)', DATA.meta.phase2Start) +
+    renderCountdownCard('Đếm ngược tới kết thúc chương trình', DATA.meta.campaignEnd);
+  function tickCountdowns(){
+    document.querySelectorAll('.cd-card').forEach(card=>{
+      const diff = Number(card.dataset.target) - Date.now();
+      if (diff <= 0){ card.classList.add('reached'); return; }
+      card.classList.remove('reached');
+      const s = Math.floor(diff/1000);
+      card.querySelector('[data-u="d"]').textContent = String(Math.floor(s/86400));
+      card.querySelector('[data-u="h"]').textContent = String(Math.floor(s%86400/3600)).padStart(2,'0');
+      card.querySelector('[data-u="m"]').textContent = String(Math.floor(s%3600/60)).padStart(2,'0');
+      card.querySelector('[data-u="s"]').textContent = String(s%60).padStart(2,'0');
+    });
+  }
+  tickCountdowns();
+  setInterval(tickCountdowns, 1000);
+
+  // ---------- KPI row ----------
+  const kpiRow = document.getElementById('kpi-row');
+  function renderKPI(metric, label, colorVar, anchorId){
+    const total = grandTotal(latest, metric);
+    const hot = prev ? total - grandTotal(prev, metric) : null;
+    const color = cvar(colorVar);
+    const hotCls = clsD(hot);
+    const hotBlock = hot === null
+      ? '<div class="kpi-value-num zero">—</div><div class="kpi-value-tag">Hot &middot; chưa có ngày trước</div>'
+      : '<div class="kpi-value-num tnum ' + hotCls + '">' + fmtD(hot) + '</div><div class="kpi-value-tag">Hot &middot; hôm nay</div>';
+    const segs = SOURCES.map(src=>{
+      const v = sourceTotal(latest, metric, src);
+      const w = total > 0 ? (v/total*100) : 0;
+      return '<div class="seg" style="width:' + w + '%; background:' + srcColor(src) + '" title="' + SRC_LABEL[src] + ': ' + fmt.format(v) + '"></div>';
+    }).join('');
+    const legend = SOURCES.map(src=>{
+      const v = sourceTotal(latest, metric, src);
+      const d = prev ? (v - sourceTotal(prev, metric, src)) : null;
+      const deltaSpan = ' <span class="src-delta ' + clsD(d) + '">(' + fmtD(d) + ')</span>';
+      return '<span class="legend-item"><span class="sw" style="background:' + srcColor(src) + '"></span>' + SRC_LABEL[src] + ': <b>' + fmt.format(v) + '</b>' + deltaSpan + '</span>';
+    }).join('');
+    return '' +
+    '<div class="card kpi-card">' +
+      '<div class="kpi-top">' +
+        '<div class="kpi-label"><span class="swatch" style="background:' + color + '"></span>Tổng ' + label + '</div>' +
+        '<button class="kpi-detail-btn" data-target="' + anchorId + '">Chi tiết &darr;</button>' +
+      '</div>' +
+      '<div class="kpi-values">' +
+        '<div class="kpi-value-block"><div class="kpi-value-num tnum">' + fmt.format(total) + '</div><div class="kpi-value-tag">Accum &middot; cộng dồn</div></div>' +
+        '<div class="kpi-value-block hot">' + hotBlock + '</div>' +
+      '</div>' +
+      '<div class="stackbar">' + (total>0 ? segs : '<div class="seg" style="width:100%;background:var(--surface-inset)"></div>') + '</div>' +
+      '<div class="legend-row">' + legend + '</div>' +
+    '</div>';
+  }
+  kpiRow.innerHTML =
+    renderKPI('sbk', 'SBK (Sổ booking khách)', '--series-sbk', 'accum-section') +
+    renderKPI('hbk', 'HBK (Hợp đồng booking khách)', '--series-hbk', 'accum-section');
+  document.querySelectorAll('.kpi-detail-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const el = document.getElementById(btn.dataset.target);
+      if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // ---------- Ranking ----------
+  function rankRows(metric){
+    return teams.map(t => ({team: t, val: teamTotal(latest, metric, t)}))
+      .sort((a,b)=> b.val - a.val);
+  }
+  function renderRankTable(title, sub, rows, metric, showCR){
+    const max = Math.max(1, ...rows.map(r=>r.val));
+    const color = cvar(metric === 'hbk' ? '--series-hbk' : '--series-sbk');
+    const body = rows.map((r, i)=>{
+      const sbkForCR = teamTotal(latest, 'sbk', r.team);
+      const cr = showCR ? (sbkForCR > 0 ? r.val / sbkForCR : 0) : null;
+      return '<tr class="' + (i===0 ? 'rank1' : '') + '">' +
+        '<td class="rank-num tnum">' + (i+1) + '</td>' +
+        '<td class="team-name">' + r.team + '</td>' +
+        '<td class="rank-bar-cell"><div class="rank-bar-track"><div class="rank-bar-fill" style="width:' + (r.val/max*100) + '%; background:' + color + '"></div></div></td>' +
+        '<td class="rank-val tnum">' + fmt.format(r.val) + '</td>' +
+        (showCR ? '<td class="rank-cr tnum">' + pct(cr) + '</td>' : '') +
+      '</tr>';
+    }).join('');
+    return '<div class="card rank-card">' +
+      '<h3>' + title + '</h3><p class="rank-sub">' + sub + '</p>' +
+      '<table class="rank-table"><thead><tr><th>#</th><th>Team</th><th></th><th style="text-align:right">' + (metric==='hbk'?'HBK':'SBK') + '</th>' + (showCR? '<th style="text-align:right">CR</th>':'') + '</tr></thead>' +
+      '<tbody>' + body + '</tbody></table>' +
+    '</div>';
+  }
+  const rankGrid = document.getElementById('rank-grid');
+  const sbkRows = rankRows('sbk');
+  let rankHtml = renderRankTable('Xếp hạng theo SBK', 'Tính đến ' + dmy(DATA.meta.phase1RankCutoff) + ' · cộng dồn từ đầu chiến dịch', sbkRows, 'sbk', false);
+  if (phase2Started){
+    const hbkRows = rankRows('hbk');
+    rankHtml += renderRankTable('Xếp hạng theo HBK & CR', 'Từ ' + dmy(DATA.meta.phase2Start) + ' · CR = HBK / SBK cộng dồn', hbkRows, 'hbk', true);
+    document.getElementById('ranking-note').textContent = 'Cả 2 bảng đang hoạt động — giai đoạn 2 đã mở';
+  } else {
+    rankHtml += '<div class="card locked-card"><div>' + LOCK_ICON + 'Bảng HBK &amp; CR</div><div class="lock-date">Mở khóa từ ' + dmy(DATA.meta.phase2Start) + '</div></div>';
+    document.getElementById('ranking-note').textContent = 'Bảng HBK & CR sẽ tự mở từ ' + dmy(DATA.meta.phase2Start);
+  }
+  rankGrid.innerHTML = rankHtml;
+
+  // ---------- Competition (team x source) ----------
+  function renderCompetition(metric, label){
+    const max = Math.max(1, ...teams.map(t=> Math.max(...SOURCES.map(s=> (latest[metric][t]||{})[s]||0))));
+    const rows = teams.map(t=>{
+      const bars = SOURCES.map(s=>{
+        const v = (latest[metric][t]||{})[s]||0;
+        return '<div class="mbar-line"><div class="mbar-track"><div class="mbar-fill" style="width:' + (v/max*100) + '%; background:' + srcColor(s) + '" title="' + SRC_LABEL[s] + ': ' + fmt.format(v) + '"></div></div><span class="mbar-val tnum">' + fmt.format(v) + '</span></div>';
+      }).join('');
+      return '<div class="team-row"><div class="tlabel">' + t + '</div><div class="tbars">' + bars + '</div></div>';
+    }).join('');
+    const legend = SOURCES.map(s=> '<span class="legend-item"><span class="sw" style="background:' + srcColor(s) + '"></span>' + SRC_LABEL[s] + '</span>').join('');
+    const tableRows = teams.map(t=>{
+      const cells = SOURCES.map(s=> '<td class="tnum">' + fmt.format((latest[metric][t]||{})[s]||0) + '</td>').join('');
+      return '<tr><td>' + t + '</td>' + cells + '<td class="tnum"><b>' + fmt.format(teamTotal(latest, metric, t)) + '</b></td></tr>';
+    }).join('');
+    const tableId = 'tbl-' + metric;
+    return '<div class="card comp-card">' +
+      '<h3>' + label + ' <button class="comp-toggle" data-target="' + tableId + '">Xem dạng bảng</button></h3>' +
+      '<div id="' + tableId + '-chart">' + rows + '</div>' +
+      '<div class="src-legend legend-row">' + legend + '</div>' +
+      '<div id="' + tableId + '" class="hidden">' +
+        '<table class="data-table"><thead><tr><th>Team</th><th>TCB</th><th>OMG</th><th>MH</th><th>Tổng</th></tr></thead><tbody>' + tableRows + '</tbody></table>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // ---------- Competition (TCB zone breakdown) ----------
+  function renderZoneCompetition(metric, label){
+    const tcbColor = srcColor('TCB');
+    const zoneRows = ZONES.map(z=> ({zone: z, val: zoneVal(latest, metric, z)}))
+      .sort((a,b)=> b.val - a.val);
+    const max = Math.max(1, ...zoneRows.map(r=>r.val));
+    const rows = zoneRows.map(r=>{
+      const bar = '<div class="mbar-line"><div class="mbar-track"><div class="mbar-fill" style="width:' + (r.val/max*100) + '%; background:' + tcbColor + '" title="' + r.zone + ': ' + fmt.format(r.val) + '"></div></div><span class="mbar-val tnum">' + fmt.format(r.val) + '</span></div>';
+      return '<div class="zone-row' + (r.val>0 ? ' zone-nonzero' : '') + '"><div class="tlabel">' + r.zone + '</div><div class="tbars">' + bar + '</div></div>';
+    }).join('');
+    const tableRows = zoneRows.map(r=> '<tr><td>' + r.zone + '</td><td class="tnum">' + fmt.format(r.val) + '</td></tr>').join('');
+    const tableId = 'tbl-zone-' + metric;
+    return '<div class="card comp-card">' +
+      '<h3>' + label + ' <button class="comp-toggle" data-target="' + tableId + '">Xem dạng bảng</button></h3>' +
+      '<div id="' + tableId + '-chart">' + rows + '</div>' +
+      '<div class="src-legend legend-row"><span class="legend-item"><span class="sw" style="background:' + tcbColor + '"></span>Chỉ áp dụng cho nguồn Techcombank (TCB) — OMG/MH chưa breakdown theo vùng</span></div>' +
+      '<div id="' + tableId + '" class="hidden">' +
+        '<table class="data-table"><thead><tr><th>Vùng (TCB)</th><th>' + (metric==='hbk'?'HBK':'SBK') + '</th></tr></thead><tbody>' + tableRows + '</tbody></table>' +
+      '</div>' +
+    '</div>';
+  }
+
+  document.getElementById('comp-grid').innerHTML =
+    renderCompetition('sbk', 'SBK theo team & nguồn') +
+    renderZoneCompetition('sbk', 'SBK theo vùng TCB') +
+    renderCompetition('hbk', 'HBK theo team & nguồn') +
+    renderZoneCompetition('hbk', 'HBK theo vùng TCB');
+  document.querySelectorAll('.comp-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const chart = btn.closest('.comp-card').querySelector('[id$="-chart"]');
+      const table = document.getElementById(btn.dataset.target);
+      const showingTable = !table.classList.contains('hidden');
+      table.classList.toggle('hidden');
+      chart.classList.toggle('hidden');
+      btn.textContent = showingTable ? 'Xem dạng bảng' : 'Xem dạng biểu đồ';
+    });
+  });
+
+  // ---------- Accum (tích lũy) vs Hot (phát sinh hôm nay) ----------
+  document.getElementById('accum-note').textContent = prev
+    ? ('"Hôm nay" = ' + dmy(latest.date) + ' so với ' + dmy(prev.date))
+    : ('Chưa có ngày trước để so sánh — "hôm nay" sẽ có dữ liệu từ lần cập nhật tiếp theo');
+
+  function accumTable(title, rows){
+    const body = rows.map(r=>
+      '<tr>' +
+        '<td class="rowlabel">' + r.label + '</td>' +
+        '<td class="tnum">' + fmt.format(r.accumS) + '</td>' +
+        '<td class="tnum ' + clsD(r.hotS) + '">' + fmtD(r.hotS) + '</td>' +
+        '<td class="tnum">' + fmt.format(r.accumH) + '</td>' +
+        '<td class="tnum ' + clsD(r.hotH) + '">' + fmtD(r.hotH) + '</td>' +
+      '</tr>'
+    ).join('');
+    return '<div class="card accum-card">' +
+      '<h3>' + title + '</h3>' +
+      '<table class="accum-table data-table"><thead>' +
+        '<tr><th rowspan="2" style="vertical-align:bottom">Nhóm</th><th colspan="2" class="grp-sbk" style="text-align:center">SBK</th><th colspan="2" class="grp-hbk" style="text-align:center">HBK</th></tr>' +
+        '<tr><th>Tích lũy</th><th>Hôm nay</th><th>Tích lũy</th><th>Hôm nay</th></tr>' +
+      '</thead><tbody>' + body + '</tbody></table>' +
+    '</div>';
+  }
+
+  const totalRows = [buildRow('Toàn chiến dịch', e=>grandTotal(e,'sbk'), e=>grandTotal(e,'hbk'))];
+  const sourceRows = SOURCES.map(s=> buildRow(SRC_LABEL[s], e=>sourceTotal(e,'sbk',s), e=>sourceTotal(e,'hbk',s)));
+  const teamRows = teams.map(t=> buildRow(t, e=>teamTotal(e,'sbk',t), e=>teamTotal(e,'hbk',t)))
+    .sort((a,b)=> b.accumS - a.accumS);
+  const zoneRows = ZONES.map(z=> buildRow(z, e=>zoneVal(e,'sbk',z), e=>zoneVal(e,'hbk',z)))
+    .sort((a,b)=> b.accumS - a.accumS);
+
+  document.getElementById('accum-grid').innerHTML =
+    accumTable('Toàn chiến dịch', totalRows) +
+    accumTable('Theo nguồn', sourceRows) +
+    accumTable('Theo team', teamRows) +
+    accumTable('Theo vùng (TCB)', zoneRows);
+
+  document.getElementById('timeline-note').textContent =
+    history.length > 1 ? (fmt.format(history.length) + ' điểm dữ liệu, từ ' + dmy(history[0].date)) : 'Mới có 1 điểm dữ liệu — biểu đồ sẽ hiện đường đi từ ngày mai';
+
+  // ---------- Overview trend: Variance Dot Chart (kết quả theo từng ngày) ----------
+  // X = chuỗi ngày, Y = KẾT QUẢ THỰC TẾ của đúng ngày đó (không phải delta) —
+  // mỗi ngày một điểm ở đúng độ cao bằng giá trị của ngày đó. Hình dạng/màu
+  // marker được gán theo rule so sánh với ngày liền trước: tăng → tam giác
+  // lên (xanh), giảm → tam giác xuống (đỏ), không đổi → tròn vàng; riêng
+  // ngày đầu tiên (chưa có ngày trước để so sánh) dùng chấm tròn xám trung
+  // tính. Không nối đường giữa các điểm — đây là dot chart, không phải
+  // line/trend. Giá trị của ngày luôn in cạnh marker nên vẫn đọc được với
+  // người khó phân biệt đỏ/xanh (hình dạng + số là mã hoá phụ).
+  function renderResultChart(metric, label, good, bad, flat, neutral){
+    const series = history.map(e=> grandTotal(e, metric));
+    const n = series.length;
+    const w = 1000, h = 172, padL = 46, padR = 20, padT = 20, padB = 30;
+    const innerW = w - padL - padR, innerH = h - padT - padB;
+    const maxData = Math.max(1, ...series);
+    const maxV = maxData * 1.18; // headroom so top markers/labels don't clip
+    const xFor = (i)=> n <= 1 ? padL + innerW/2 : padL + (i/(n-1))*innerW;
+    const yFor = (v)=> padT + innerH - (v/maxV)*innerH;
+    const yBase = padT + innerH;
+
+    let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:auto;display:block" role="img" aria-label="Kết quả ' + label + ' theo từng ngày">';
+    svg += '<text x="' + padL + '" y="13" font-size="11" font-weight="700" fill="' + cvar('--ink-secondary') + '">' + label + ' theo ngày — màu/hình theo tăng, giảm, không đổi so với hôm trước</text>';
+    svg += '<line x1="' + padL + '" x2="' + (w-padR) + '" y1="' + yBase + '" y2="' + yBase + '" stroke="' + cvar('--grid') + '" stroke-width="1"/>';
+    svg += '<text x="' + (padL-8) + '" y="' + (padT+4) + '" font-size="10" fill="' + cvar('--ink-muted') + '" text-anchor="end">' + fmt.format(maxData) + '</text>';
+    svg += '<text x="' + (padL-8) + '" y="' + (yBase+3.5) + '" font-size="10" fill="' + cvar('--ink-muted') + '" text-anchor="end">0</text>';
+    history.forEach((e,i)=>{
+      const v = series[i];
+      const x = xFor(i), y = yFor(v);
+      let color, marker, tipExtra;
+      if (i === 0){
+        color = neutral;
+        marker = '<circle cx="' + x + '" cy="' + y + '" r="5.5" fill="' + neutral + '"/>';
+        tipExtra = ' (điểm khởi đầu)';
+      } else {
+        const delta = v - series[i-1];
+        if (delta > 0){
+          color = good;
+          marker = '<path d="M ' + x + ' ' + (y-7) + ' L ' + (x+7) + ' ' + (y+6) + ' L ' + (x-7) + ' ' + (y+6) + ' Z" fill="' + good + '"/>';
+        } else if (delta < 0){
+          color = bad;
+          marker = '<path d="M ' + x + ' ' + (y+7) + ' L ' + (x+7) + ' ' + (y-6) + ' L ' + (x-7) + ' ' + (y-6) + ' Z" fill="' + bad + '"/>';
+        } else {
+          color = flat;
+          marker = '<circle cx="' + x + '" cy="' + y + '" r="6" fill="' + flat + '"/>';
+        }
+        tipExtra = ' (' + fmtD(delta) + ' so với hôm trước)';
+      }
+      svg += '<g><title>' + dmy(e.date) + ': ' + fmt.format(v) + tipExtra + '</title>' + marker + '</g>';
+      svg += '<text x="' + x + '" y="' + (y-12) + '" font-size="10.5" font-weight="700" text-anchor="middle" fill="' + color + '">' + fmt.format(v) + '</text>';
+      svg += '<text x="' + x + '" y="' + (h-8) + '" font-size="10" fill="' + cvar('--ink-muted') + '" text-anchor="middle">' + dm(e.date) + '</text>';
+    });
+    svg += '</svg>';
+    return svg;
+  }
+  function renderOverview(){
+    const good = cvar('--status-good'), bad = cvar('--status-critical'), flat = cvar('--status-warning'), neutral = cvar('--ink-muted');
+    document.getElementById('overview-chart').innerHTML =
+      '<div class="variance-chart-wrap">' + renderResultChart('sbk', 'SBK', good, bad, flat, neutral) + '</div>' +
+      '<div class="variance-chart-wrap">' + renderResultChart('hbk', 'HBK', good, bad, flat, neutral) + '</div>' +
+      '<div class="legend-row" style="margin-top:10px">' +
+      '<span class="legend-item"><span class="sw tri-up"></span>Tăng so với hôm trước</span>' +
+      '<span class="legend-item"><span class="sw tri-down"></span>Giảm so với hôm trước</span>' +
+      '<span class="legend-item"><span class="sw dot-flat"></span>Không đổi</span>' +
+      '<span class="legend-item"><span class="sw dot-neutral"></span>Điểm khởi đầu (chưa có ngày trước để so sánh)</span>' +
+      '</div>' +
+      (history.length === 1 ? '<p class="single-point-note">Mới có 1 điểm dữ liệu (' + dmy(history[0].date) + '). Marker tăng/giảm/không đổi sẽ xuất hiện khi có ngày thứ 2 trở lên.</p>' : '');
+  }
+  renderOverview();
+
+})();
+</script>

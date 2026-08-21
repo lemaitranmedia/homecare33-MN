@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "campaign": "HOMECARE 33",
+    "team": "SIH Miền Nam - OneHousing",
+    "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/1XyNcrpYsXEns2wOqvO5IibtkxuOj-NyGURljeOpneR8/edit",
+    "sheetTab": "Homecare33",
+    "campaignStart": "2026-08-19",
+    "phase2Start": "2026-09-04",
+    "phase1RankCutoff": "2026-09-03",
+    "campaignEnd": "2026-09-30",
+    "timezone": "Asia/Saigon"
+  },
+  "priorityOrder": ["PASG-03", "PASG-16", "PASG-02", "PASG-10", "PASG-09"],
+  "sources": ["TCB", "OM", "MH"],
+  "sourceLabels": {"TCB": "Techcombank (TCB)", "OM": "One Mount Group (OMG)", "MH": "Masterise Homes (MH)"},
+  "zonesTCB": ["Vùng 9", "Vùng 10", "Vùng 11", "Vùng 12", "Vùng 12A", "Vùng 14", "Vùng 15", "Vùng 16", "Hub Private", "HO"]
+}
